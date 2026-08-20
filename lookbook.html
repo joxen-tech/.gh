@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lookbook — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main>
+  <section class="hero-banner">
+    <img src="hero.jpg" alt="dryrobe lookbook">
+    <div class="hb-content">
+      <h1 class="font-archivo reveal">LOOKBOOK</h1>
+      <p class="reveal">Full looks, shot on the street. Tap the dots to shop each piece.</p>
+    </div>
+  </section>
+
+  <section class="page-section">
+    <div class="wrap" style="max-width:1100px;">
+      <div id="looks-wrap"></div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  const LOOKS = [
+    {
+      title: "The Reign Look", img: "collection-1.jpg", type: "tall",
+      hotspots: [{ x: 42, y: 30, id: "men-reign-hoodie" }, { x: 58, y: 68, id: "men-reign-boardshort" }],
+      shopIds: ["men-reign-hoodie", "men-reign-boardshort", "acc-reign-cap", "men-reign-oversized-tee"]
+    },
+    {
+      title: "After Dark", img: "collection-2.jpg", type: "wide",
+      hotspots: [{ x: 30, y: 40, id: "women-noir-sculpt-dress" }, { x: 68, y: 55, id: "women-cropped-utility-jacket" }],
+      shopIds: ["women-noir-sculpt-dress", "women-cropped-utility-jacket", "men-shadow-zip-hoodie"]
+    },
+    {
+      title: "Weekend Motion", img: "collection-3.jpg", type: "tall",
+      hotspots: [{ x: 50, y: 35, id: "men-motion-track-short" }, { x: 35, y: 70, id: "accessory-studio-socks" }],
+      shopIds: ["men-motion-track-short", "men-relaxed-linen-shirt", "accessory-studio-socks"]
+    }
+  ];
+
+  const wrap = document.getElementById("looks-wrap");
+  LOOKS.forEach((look, li) => {
+    const section = document.createElement("div");
+    section.style.marginBottom = "4rem";
+    const spread = document.createElement("div");
+    spread.className = "lookbook-spread " + look.type + " reveal";
+    spread.innerHTML = '<img src="' + look.img + '" alt="' + look.title + '">';
+    look.hotspots.forEach((h, hi) => {
+      const dot = document.createElement("button");
+      dot.className = "hotspot";
+      dot.style.left = h.x + "%"; dot.style.top = h.y + "%";
+      dot.innerHTML = ICON.plus;
+      dot.setAttribute("aria-label", "view product");
+      const card = document.createElement("div");
+      card.className = "hotspot-card";
+      const cardLeft = h.x > 55 ? "auto" : (h.x + 4) + "%";
+      const cardRight = h.x > 55 ? (100 - h.x + 4) + "%" : "auto";
+      card.style.left = cardLeft; card.style.right = cardRight;
+      card.style.top = Math.min(h.y, 70) + "%";
+      const p = getProduct(h.id);
+      if (p) {
+        const thumb = p.photo ? '<img src="' + p.image + '" alt="" style="width:100%;height:100%;object-fit:cover;">' : ICON[productGarmentIcon(p)];
+        card.innerHTML = '<div class="hc-thumb">' + thumb + '</div><div class="hc-name">' + p.name + '</div><div class="hc-price">GHS ' + p.price + '</div><a class="hc-link" href="product.html?id=' + p.id + '">View Product</a>';
+      }
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.querySelectorAll(".hotspot-card.open").forEach((c) => { if (c !== card) c.classList.remove("open"); });
+        card.classList.toggle("open");
+      });
+      spread.appendChild(dot);
+      spread.appendChild(card);
+    });
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".hotspot") && !e.target.closest(".hotspot-card")) {
+        spread.querySelectorAll(".hotspot-card.open").forEach((c) => c.classList.remove("open"));
+      }
+    });
+
+    const head = document.createElement("div");
+    head.className = "section-head reveal";
+    head.style.marginTop = "1.25rem";
+    head.innerHTML = '<div><h2 class="font-archivo">' + look.title + '</h2><p class="sub">Shop this look — every piece, one tap away.</p></div>';
+
+    const rail = document.createElement("div");
+    rail.className = "rail-track reveal";
+    rail.id = "look-rail-" + li;
+
+    section.appendChild(spread);
+    section.appendChild(head);
+    section.appendChild(rail);
+    wrap.appendChild(section);
+
+    const products = look.shopIds.map(getProduct).filter(Boolean);
+    buildRail(rail, products);
+  });
+
+  window.addEventListener("load", () => { initScrollReveal(); initMagnetic(); });
+})();
+</script>
+</body>
+</html>

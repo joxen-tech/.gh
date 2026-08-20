@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main style="padding:7.5rem 0 5rem;">
+  <div class="wrap" style="max-width:780px;">
+    <div class="section-head" style="border-bottom:none;">
+      <div><h1 class="font-archivo" style="font-size:2rem;">Frequently Asked Questions</h1><p class="sub">Everything about orders, shipping, returns, sizing and your account.</p></div>
+    </div>
+    <div id="faq-wrap"></div>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  const FAQ_GROUPS = [
+    { title: "Orders", items: [
+      ["How do I track my order?", "Once your order ships, you'll receive a tracking link by email and SMS. You can also reach out via the Contact page with your order number."],
+      ["Can I change or cancel my order?", "We can amend or cancel an order within 2 hours of it being placed — contact us as soon as possible with your order number."],
+      ["I received the wrong item — what now?", "Sorry about that. Contact us with a photo of what arrived and your order number, and we'll arrange a replacement or refund."]
+    ]},
+    { title: "Shipping", items: [
+      ["How long does delivery take?", "Orders within Accra typically arrive in 1–3 business days. Nationwide delivery across Ghana takes 3–5 business days, and international shipping varies by destination."],
+      ["Do you ship internationally?", "Yes — international shipping is available at checkout, with rates and timelines calculated by destination."],
+      ["Is shipping free?", "Shipping is free on orders over GHS 500. Below that, a flat rate applies at checkout."]
+    ]},
+    { title: "Returns", items: [
+      ["What's your return policy?", "30-day free returns on unworn items with tags attached. Start a return from your order confirmation email or by contacting us directly."],
+      ["How long do refunds take?", "Once we receive your return, refunds are processed within 5–7 business days back to your original payment method."],
+      ["Can I exchange for a different size?", "Yes — request an exchange instead of a refund when starting your return, subject to stock availability."]
+    ]},
+    { title: "Sizes", items: [
+      ["How do I find my size?", "Every product page has a Size Guide link with measurements in centimetres. When between sizes, we recommend sizing up for our oversized fits."],
+      ["Do kids' sizes run true?", "Kids' sizing is age-based (e.g. 4–5Y) and runs true to standard Ghanaian and UK children's sizing."]
+    ]},
+    { title: "Products", items: [
+      ["What materials do you use?", "Mostly heavyweight cotton, cotton-fleece and cotton-blend twills — the exact material and care instructions are listed on every product page."],
+      ["Will an item be restocked?", "Sold-out items show a 'Notify Me' option — join the list and we'll email you the moment it's back."]
+    ]},
+    { title: "Payments", items: [
+      ["What payment methods do you accept?", "Mobile Money, debit and credit cards, and cash on delivery within Accra."],
+      ["Is my payment information secure?", "Yes — payment details are handled by our payment processor and are never stored on our own servers."]
+    ]},
+    { title: "Account", items: [
+      ["Do I need an account to order?", "No — you can check out as a guest. Creating an account just lets you track orders and save your wishlist across devices."],
+      ["How do I reset my password?", "Use the 'forgot password' link on the sign-in page to receive a reset email."]
+    ]},
+    { title: "General", items: [
+      ["Where are you based?", "dryrobe® is based in Accra, Ghana, with nationwide and international shipping."],
+      ["Do you have a physical store?", "Not yet — we're online-only for now, with occasional pop-ups announced on Instagram."]
+    ]}
+  ];
+
+  const wrap = document.getElementById("faq-wrap");
+  FAQ_GROUPS.forEach((group) => {
+    const h = document.createElement("h3");
+    h.className = "faq-group-title font-archivo";
+    h.textContent = group.title;
+    wrap.appendChild(h);
+    group.items.forEach(([q, a]) => {
+      const item = document.createElement("div");
+      item.className = "faq-item";
+      item.innerHTML = '<button class="faq-trigger">' + q + ICON.chevronDown + '</button><div class="faq-panel"><p>' + a + '</p></div>';
+      item.querySelector(".faq-trigger").addEventListener("click", () => item.classList.toggle("open"));
+      wrap.appendChild(item);
+    });
+  });
+})();
+</script>
+</body>
+</html>

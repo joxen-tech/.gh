@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main id="pp-main">
+  <div class="wrap">
+    <p class="breadcrumb" id="pp-breadcrumb"></p>
+    <div class="product-page-inner">
+      <div class="pp-gallery-col">
+        <div class="gallery-main">
+          <div id="gallery-media"></div>
+          <button class="gallery-icon-btn" id="gallery-like" aria-label="wishlist"></button>
+          <button class="gallery-icon-btn" id="gallery-prev" aria-label="previous image"></button>
+          <button class="gallery-icon-btn" id="gallery-next" aria-label="next image"></button>
+        </div>
+        <div class="thumbnails" id="pp-thumbnails"></div>
+      </div>
+
+      <div class="pp-info-col">
+        <div class="pp-info-sticky">
+          <p class="pp-eyebrow" id="pp-collection"></p>
+          <h1 class="pp-title font-archivo" id="pp-name"></h1>
+          <p class="pp-price" id="pp-price"></p>
+          <p class="pp-desc" id="pp-desc"></p>
+
+          <div class="pp-sizes">
+            <div class="pp-section-label"><span>Size</span><button id="size-guide-btn">Size Guide</button></div>
+            <div id="pp-sizes-list"></div>
+          </div>
+
+          <div class="pp-colors">
+            <p class="pp-section-label"><span>Color: <span id="pp-color-name"></span></span></p>
+            <div id="pp-colors-list"></div>
+          </div>
+
+          <div class="pp-qty">
+            <span class="pp-section-label" style="margin:0;">Quantity</span>
+            <div class="qty-stepper"><button id="pp-qty-dec"></button><span id="pp-qty-val">1</span><button id="pp-qty-inc">+</button></div>
+          </div>
+
+          <button class="pp-add-cart" id="pp-add-cart"></button>
+          <button class="pp-wishlist-btn" id="pp-wishlist-btn"></button>
+
+          <div class="pp-perks">
+            <div class="pp-perk" id="perk-shipping"></div>
+            <div class="pp-perk" id="perk-returns"></div>
+            <div class="pp-perk" id="perk-secure"></div>
+          </div>
+
+          <div class="pp-payments">
+            <p>Our payment methods</p>
+            <div class="payment-chips" id="pp-payments"></div>
+          </div>
+
+          <div class="pp-accordions" id="pp-accordions"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPLETE THE LOOK -->
+    <section class="page-section" id="ctl-section">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Complete The Look</h2><p class="sub">Coordinated pieces from the same edit.</p></div>
+      </div>
+      <div class="rail-track reveal" id="ctl-page-track"></div>
+    </section>
+
+    <!-- YOU MAY ALSO LIKE -->
+    <section class="page-section" id="related-section">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">You May Also Like</h2></div>
+      </div>
+      <div class="rail-track reveal" id="related-track"></div>
+    </section>
+
+    <!-- RECENTLY VIEWED -->
+    <section class="page-section" id="recent-section" style="display:none;">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">You Were Looking At</h2></div>
+      </div>
+      <div class="rail-track reveal" id="recent-track"></div>
+    </section>
+  </div>
+</main>
+
+<div id="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close"></button>
+    <h3 class="font-archivo">Size Guide</h3>
+    <table class="size-table">
+      <thead><tr><th>Size</th><th>Chest (cm)</th><th>Waist (cm)</th><th>Length (cm)</th></tr></thead>
+      <tbody>
+        <tr><td>XS</td><td>84</td><td>66</td><td>66</td></tr>
+        <tr><td>S</td><td>90</td><td>72</td><td>68</td></tr>
+        <tr><td>M</td><td>96</td><td>78</td><td>70</td></tr>
+        <tr><td>L</td><td>104</td><td>86</td><td>72</td></tr>
+        <tr><td>XL</td><td>112</td><td>94</td><td>74</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.75rem;color:#737373;margin-top:1rem;">Measurements are approximate. For trousers and jeans, sizes shown are waist measurement in inches — refer to the product's size list.</p>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  const params = new URLSearchParams(location.search);
+  let product = getProduct(params.get("id")) || PRODUCTS[0];
+  let galleryIndex = 0, selectedSize = product.sizes[0], selectedColor = product.colors[0].name, qty = 1;
+
+  document.getElementById("pp-qty-dec").innerHTML = ICON.minus;
+  document.getElementById("gallery-like").innerHTML = ICON.heart;
+  document.getElementById("gallery-prev").innerHTML = ICON.chevronLeft;
+  document.getElementById("gallery-next").innerHTML = ICON.chevronRight;
+  document.getElementById("size-guide-btn").addEventListener("click", () => document.getElementById("modal-overlay").classList.add("open"));
+  document.getElementById("modal-close").innerHTML = ICON.x;
+  document.getElementById("modal-close").addEventListener("click", () => document.getElementById("modal-overlay").classList.remove("open"));
+  document.getElementById("modal-overlay").addEventListener("click", (e) => { if (e.target.id === "modal-overlay") e.currentTarget.classList.remove("open"); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.getElementById("modal-overlay").classList.remove("open"); });
+
+  function render() {
+    document.title = product.name + " — dryrobe®";
+    document.getElementById("pp-breadcrumb").innerHTML =
+      '<a href="index.html">Home</a> / <a href="shop.html?gender=' + encodeURIComponent(product.gender) + '">' + product.gender + '</a> / ' + product.name;
+    const meta = getCollectionMeta(product.collection);
+    document.getElementById("pp-collection").textContent = (meta ? meta.name + " Collection" : product.category);
+    document.getElementById("pp-name").textContent = product.name;
+    document.getElementById("pp-price").textContent = "GHS " + product.price;
+    document.getElementById("pp-desc").textContent = product.description;
+
+    renderGallery();
+    renderSizes();
+    renderColors();
+    renderQty();
+    renderButtons();
+    renderPerks();
+    renderPayments();
+    renderAccordions();
+    renderCTL();
+    renderRelated();
+    renderRecent();
+
+    Cart.addRecent(product.id);
+    renderAll();
+    initScrollReveal();
+  }
+
+  function renderGallery() {
+    const media = document.getElementById("gallery-media");
+    if (product.photo) {
+      const src = product.gallery[galleryIndex] || product.image;
+      media.innerHTML = '<img src="' + src + '" alt="' + product.name + '" class="fade-in">';
+    } else {
+      media.innerHTML = '<div class="ph-gallery-main" style="background:' + placeholderGradient(product) + '">' + ICON[productGarmentIcon(product)].replace('width="40" height="40"', 'width="96" height="96"') + '</div>';
+    }
+    document.getElementById("gallery-like").classList.toggle("liked", Cart.isWishlisted(product.id));
+
+    const thumbs = document.getElementById("pp-thumbnails");
+    thumbs.innerHTML = "";
+    const galleryList = product.photo ? product.gallery : [product.image];
+    galleryList.forEach((src, i) => {
+      const btn = document.createElement("button");
+      btn.className = "thumb-btn" + (i === galleryIndex ? " active" : "");
+      btn.innerHTML = product.photo ? '<img src="' + src + '" alt="">' : ICON[productGarmentIcon(product)];
+      btn.addEventListener("click", () => { galleryIndex = i; renderGallery(); });
+      thumbs.appendChild(btn);
+    });
+  }
+  document.getElementById("gallery-prev").addEventListener("click", () => {
+    const list = product.photo ? product.gallery : [product.image];
+    galleryIndex = (galleryIndex - 1 + list.length) % list.length; renderGallery();
+  });
+  document.getElementById("gallery-next").addEventListener("click", () => {
+    const list = product.photo ? product.gallery : [product.image];
+    galleryIndex = (galleryIndex + 1) % list.length; renderGallery();
+  });
+  document.getElementById("gallery-like").addEventListener("click", () => { Cart.toggleWishlist(product.id); renderGallery(); });
+
+  function renderSizes() {
+    const wrap = document.getElementById("pp-sizes-list");
+    wrap.innerHTML = "";
+    product.sizes.forEach((s) => {
+      const b = document.createElement("button");
+      b.className = "size-btn" + (selectedSize === s ? " active" : "");
+      b.textContent = s;
+      b.addEventListener("click", () => { selectedSize = s; renderSizes(); });
+      wrap.appendChild(b);
+    });
+  }
+  function renderColors() {
+    document.getElementById("pp-color-name").textContent = selectedColor;
+    const wrap = document.getElementById("pp-colors-list");
+    wrap.innerHTML = "";
+    product.colors.forEach((c) => {
+      const b = document.createElement("button");
+      b.className = "color-swatch" + (selectedColor === c.name ? " active" : "");
+      b.style.background = c.hex;
+      b.title = c.name;
+      b.addEventListener("click", () => { selectedColor = c.name; renderColors(); });
+      wrap.appendChild(b);
+    });
+  }
+  function renderQty() { document.getElementById("pp-qty-val").textContent = qty; }
+  document.getElementById("pp-qty-inc").addEventListener("click", () => { qty++; renderQty(); });
+  document.getElementById("pp-qty-dec").addEventListener("click", () => { if (qty > 1) qty--; renderQty(); });
+
+  function renderButtons() {
+    const addBtn = document.getElementById("pp-add-cart");
+    const wishBtn = document.getElementById("pp-wishlist-btn");
+    if (product.stock === 0) {
+      addBtn.innerHTML = "Notify Me When Available";
+      addBtn.onclick = () => toast(ICON.check, "We'll email you when " + product.name + " restocks (demo)");
+    } else {
+      addBtn.innerHTML = "Add to Bag " + ICON.cartSm;
+      addBtn.onclick = () => Cart.add(product.id, selectedSize, selectedColor, qty);
+    }
+    function paintWish() {
+      const liked = Cart.isWishlisted(product.id);
+      wishBtn.classList.toggle("liked", liked);
+      wishBtn.innerHTML = ICON.heart + (liked ? " Saved to Wishlist" : " Add to Wishlist");
+    }
+    paintWish();
+    wishBtn.onclick = () => { Cart.toggleWishlist(product.id); paintWish(); renderGallery(); };
+  }
+
+  function renderPerks() {
+    document.getElementById("perk-shipping").innerHTML = ICON.truck + " Free shipping over GHS " + FREE_SHIPPING_THRESHOLD;
+    document.getElementById("perk-returns").innerHTML = ICON.rotate + " 30-day free returns";
+    document.getElementById("perk-secure").innerHTML = ICON.check + " " + product.material;
+  }
+  function renderPayments() {
+    document.getElementById("pp-payments").innerHTML = ["Visa", "Mastercard", "Mobile Money", "PayPal"].map((p) => '<span class="payment-chip">' + p + '</span>').join("");
+  }
+
+  function renderAccordions() {
+    const ACC = [
+      { icon: "fileText", title: "Description", body: product.description },
+      { icon: "garmentTee", title: "Material & Care", body: product.material + ". " + product.care + "." },
+      { icon: "truck", title: "Shipping", body: "Orders within Accra typically arrive in 1–3 business days. Nationwide and international shipping available — rates shown at checkout." },
+      { icon: "rotate", title: "Returns", body: "30-day free returns on unworn items with tags attached. Start a return from your order confirmation email." }
+    ];
+    const wrap = document.getElementById("pp-accordions");
+    wrap.innerHTML = "";
+    ACC.forEach((a, i) => {
+      const item = document.createElement("div");
+      item.className = "faq-item" + (i === 0 ? " open" : "");
+      item.innerHTML = '<button class="faq-trigger">' + a.title + ICON.chevronDown + '</button><div class="faq-panel"><p>' + a.body + '</p></div>';
+      item.querySelector(".faq-trigger").addEventListener("click", () => item.classList.toggle("open"));
+      wrap.appendChild(item);
+    });
+  }
+
+  function buildMiniRail(trackId, list) {
+    const track = document.getElementById(trackId);
+    track.innerHTML = "";
+    list.forEach((p) => track.appendChild(buildProductCard(p)));
+    enableRailDrag(track);
+  }
+  function renderCTL() {
+    const rel = getRelated(product, 5);
+    document.getElementById("ctl-section").style.display = rel.length ? "block" : "none";
+    buildMiniRail("ctl-page-track", rel);
+  }
+  function renderRelated() {
+    const rel = getRelated(product, 8).slice().reverse();
+    buildMiniRail("related-track", rel);
+  }
+  function renderRecent() {
+    const ids = Cart.recent.filter((id) => id !== product.id);
+    const list = ids.map(getProduct).filter(Boolean).slice(0, 8);
+    document.getElementById("recent-section").style.display = list.length ? "block" : "none";
+    if (list.length) buildMiniRail("recent-track", list);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

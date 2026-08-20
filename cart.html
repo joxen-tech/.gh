@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Bag — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main style="padding:7.5rem 0 5rem;">
+  <div class="wrap">
+    <div class="section-head" style="border-bottom:none;">
+      <div><h1 class="font-archivo" style="font-size:2rem;">Your Bag</h1><p class="sub" id="cp-count"></p></div>
+    </div>
+
+    <div id="cp-empty" class="empty-state" style="display:none;">
+      <div id="cp-empty-icon"></div>
+      <h3>Your bag is empty</h3>
+      <p>Add something you'll actually wear.</p>
+      <a href="shop.html" class="btn btn-light">Start Shopping</a>
+    </div>
+
+    <div id="cp-content" class="cart-page-grid">
+      <div class="cart-page-list" id="cp-list"></div>
+      <div class="cart-page-summary">
+        <h3 class="font-archivo">Order Summary</h3>
+        <div class="summary-row"><span>Subtotal</span><span id="cp-subtotal"></span></div>
+        <div class="summary-row"><span>Shipping</span><span id="cp-shipping"></span></div>
+        <div class="summary-row total"><span>Total</span><span id="cp-total"></span></div>
+        <a href="checkout.html" class="checkout-btn" style="margin-top:1rem;">Proceed to Checkout</a>
+        <a href="shop.html" class="view-cart-link">Continue shopping</a>
+      </div>
+    </div>
+
+    <section class="page-section" id="cp-rec-section" style="display:none;">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Complete The Look</h2></div>
+      </div>
+      <div class="rail-track reveal" id="cp-rec-track"></div>
+    </section>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  document.getElementById("cp-empty-icon").innerHTML = ICON.cartLg;
+
+  function render() {
+    const empty = document.getElementById("cp-empty");
+    const content = document.getElementById("cp-content");
+    const recSection = document.getElementById("cp-rec-section");
+    document.getElementById("cp-count").textContent = Cart.count() + (Cart.count() === 1 ? " item" : " items");
+
+    if (Cart.items.length === 0) {
+      empty.style.display = "block"; content.style.display = "none"; recSection.style.display = "none";
+      return;
+    }
+    empty.style.display = "none"; content.style.display = "grid";
+
+    const list = document.getElementById("cp-list");
+    list.innerHTML = "";
+    Cart.items.forEach((it) => {
+      const p = getProduct(it.id);
+      if (!p) return;
+      const row = document.createElement("div");
+      row.className = "cart-page-item";
+      const thumb = p.photo ? '<img src="' + p.image + '" alt="' + p.name + '">' : ICON[productGarmentIcon(p)];
+      row.innerHTML =
+        '<a href="product.html?id=' + p.id + '" class="cpi-thumb">' + thumb + '</a>' +
+        '<div>' +
+          '<div style="display:flex;justify-content:space-between;gap:1rem;">' +
+            '<a href="product.html?id=' + p.id + '"><p class="ci-name" style="font-size:15px;">' + p.name + '</p></a>' +
+            '<button class="remove-btn" aria-label="remove">' + ICON.trash + '</button>' +
+          '</div>' +
+          '<p class="ci-meta">Size ' + it.size + ' · ' + it.color + '</p>' +
+          '<div class="ci-row2">' +
+            '<div class="qty-stepper"><button data-dec>' + ICON.minus + '</button><span>' + it.qty + '</span><button data-inc>' + ICON.plus + '</button></div>' +
+            '<span class="ci-price" style="font-size:15px;">GHS ' + (p.price * it.qty) + '</span>' +
+          '</div>' +
+        '</div>';
+      row.querySelector("[data-inc]").addEventListener("click", () => Cart.updateQty(it.id, it.size, it.color, it.qty + 1));
+      row.querySelector("[data-dec]").addEventListener("click", () => Cart.updateQty(it.id, it.size, it.color, it.qty - 1));
+      row.querySelector(".remove-btn").addEventListener("click", () => Cart.remove(it.id, it.size, it.color));
+      list.appendChild(row);
+    });
+
+    document.getElementById("cp-subtotal").textContent = "GHS " + Cart.subtotal();
+    const ship = Cart.shipping();
+    document.getElementById("cp-shipping").textContent = ship === 0 ? "Free" : "GHS " + ship;
+    document.getElementById("cp-total").textContent = "GHS " + Cart.total();
+
+    const last = getProduct(Cart.items[Cart.items.length - 1].id);
+    const rel = last ? getRelated(last, 6) : [];
+    recSection.style.display = rel.length ? "block" : "none";
+    if (rel.length) buildRail(document.getElementById("cp-rec-track"), rel);
+  }
+
+  document.addEventListener("cart:rerender", render);
+  const origRenderAll = renderAll;
+  window.onCartRender = render;
+  render();
+})();
+</script>
+</body>
+</html>

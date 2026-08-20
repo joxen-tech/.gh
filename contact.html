@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main style="padding:7.5rem 0 5rem;">
+  <div class="wrap">
+    <div class="section-head" style="border-bottom:none;">
+      <div><h1 class="font-archivo" style="font-size:2rem;">Contact Us</h1><p class="sub">Questions about an order, sizing, or a wholesale enquiry — we read everything.</p></div>
+    </div>
+
+    <div class="contact-grid">
+      <div>
+        <div class="contact-info-item" id="ci-address"></div>
+        <div class="contact-info-item" id="ci-email"></div>
+        <div class="contact-info-item" id="ci-phone"></div>
+        <div class="contact-info-item" id="ci-hours"></div>
+        <div class="footer-social" style="margin-top:1.5rem;">
+          <a href="#" aria-label="instagram" id="ci-ig"></a>
+        </div>
+      </div>
+
+      <div>
+        <div class="form-success" id="contact-success">
+          <span id="cs-icon"></span>
+          <span>Thanks — your message has been noted. This is a frontend-only prototype, so no message was actually sent, but a real inbox would receive this.</span>
+        </div>
+        <form id="contact-form" novalidate>
+          <div class="checkout-form-row two">
+            <div class="form-field" id="cf-name"><label>Name</label><input type="text" id="c-name"><span class="field-error">Required.</span></div>
+            <div class="form-field" id="cf-email"><label>Email</label><input type="email" id="c-email"><span class="field-error">Enter a valid email.</span></div>
+          </div>
+          <div class="form-field" id="cf-subject">
+            <label>Subject</label>
+            <select id="c-subject">
+              <option>Order enquiry</option>
+              <option>Sizing help</option>
+              <option>Returns &amp; exchanges</option>
+              <option>Wholesale / press</option>
+              <option>Something else</option>
+            </select>
+          </div>
+          <div class="form-field" id="cf-message">
+            <label>Message</label>
+            <textarea id="c-message" placeholder="How can we help?"></textarea>
+            <span class="field-error">Tell us a little more (10+ characters).</span>
+          </div>
+          <button type="submit" class="btn btn-light" style="width:100%;height:3rem;">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  document.getElementById("ci-address").innerHTML = ICON.mapPin + '<div><h4>Studio &amp; Returns Address</h4><p>12 Oxford Street, Osu, Accra, Ghana</p></div>';
+  document.getElementById("ci-email").innerHTML = ICON.mail + '<div><h4>Email</h4><p>hello@dryrobe.example</p></div>';
+  document.getElementById("ci-phone").innerHTML = ICON.phone + '<div><h4>Phone / WhatsApp</h4><p>+233 24 000 0000</p></div>';
+  document.getElementById("ci-hours").innerHTML = ICON.check + '<div><h4>Hours</h4><p>Mon–Sat, 9am–6pm GMT</p></div>';
+  document.getElementById("ci-ig").innerHTML = ICON.instagram;
+  document.getElementById("cs-icon").innerHTML = ICON.check;
+
+  document.getElementById("contact-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fields = [
+      { id: "name", test: (v) => v.trim().length > 0 },
+      { id: "email", test: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+      { id: "message", test: (v) => v.trim().length >= 10 }
+    ];
+    let valid = true;
+    fields.forEach((f) => {
+      const input = document.getElementById("c-" + f.id);
+      const field = document.getElementById("cf-" + f.id);
+      const ok = f.test(input.value);
+      field.classList.toggle("error", !ok);
+      if (!ok) valid = false;
+    });
+    if (!valid) return;
+    document.getElementById("contact-success").classList.add("show");
+    document.getElementById("contact-form").reset();
+    document.getElementById("contact-success").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+})();
+</script>
+</body>
+</html>

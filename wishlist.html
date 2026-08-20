@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wishlist — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main style="padding:7.5rem 0 5rem;">
+  <div class="wrap">
+    <div class="section-head" style="border-bottom:none;">
+      <div><h1 class="font-archivo" style="font-size:2rem;">Wishlist</h1><p class="sub" id="wl-count"></p></div>
+    </div>
+    <div id="wl-empty" class="empty-state" style="display:none;">
+      <div id="wl-empty-icon"></div>
+      <h3>Nothing saved yet</h3>
+      <p>Tap the heart on any product to save it here.</p>
+      <a href="shop.html" class="btn btn-light">Browse the Shop</a>
+    </div>
+    <div class="shop-grid" id="wl-grid"></div>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  document.getElementById("wl-empty-icon").innerHTML = ICON.heart;
+
+  function render() {
+    const items = Cart.wishlist.map(getProduct).filter(Boolean);
+    document.getElementById("wl-count").textContent = items.length + (items.length === 1 ? " saved item" : " saved items");
+    const grid = document.getElementById("wl-grid");
+    const empty = document.getElementById("wl-empty");
+    grid.innerHTML = "";
+    if (items.length === 0) { empty.style.display = "block"; grid.style.display = "none"; return; }
+    empty.style.display = "none"; grid.style.display = "grid";
+    items.forEach((p) => grid.appendChild(buildProductCard(p)));
+  }
+
+  window.onCartRender = render;
+  render();
+})();
+</script>
+</body>
+</html>

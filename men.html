@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Men — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-men">
+<div id="site-header"></div>
+
+<main>
+  <section class="hero-banner">
+    <img src="collection-1.jpg" alt="Men's collection">
+    <div class="hb-content">
+      <h1 class="font-archivo reveal">MEN</h1>
+      <p class="reveal">Structured. Utilitarian. Built to move through a city, not around it.</p>
+    </div>
+  </section>
+
+  <section class="page-section" style="padding-top:2rem;">
+    <div class="wrap">
+      <div class="filter-chip-row reveal" id="men-cat-chips" style="margin-bottom:2.5rem;"></div>
+
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">New In</h2><p class="sub">The latest additions to the Men's edit.</p></div>
+        <div class="rail-arrows"><button id="mn-new-prev"></button><button id="mn-new-next"></button></div>
+      </div>
+      <div class="rail-track reveal" id="mn-new-track" style="margin-bottom:3.5rem;"></div>
+
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Full Edit</h2><p class="sub" id="men-count"></p></div>
+        <a href="shop.html?gender=Men" class="see-all">Open in Shop →</a>
+      </div>
+      <div class="shop-grid reveal" id="men-grid"></div>
+    </div>
+  </section>
+
+  <section class="page-section" style="background:#050505;">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Men's Essentials</h2><p class="sub">The pieces that anchor everything else.</p></div>
+      </div>
+      <div class="rail-track reveal" id="mn-essentials-track"></div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  const all = getByGender("Men");
+  document.getElementById("men-count").textContent = all.length + " products";
+
+  const cats = [...new Set(all.map((p) => p.category))].sort();
+  const chipWrap = document.getElementById("men-cat-chips");
+  chipWrap.innerHTML = cats.map((c) => '<a class="filter-chip" href="shop.html?gender=Men&category=' + encodeURIComponent(c) + '">' + c + '</a>').join("");
+
+  buildRail(document.getElementById("mn-new-track"), getNewArrivals().filter((p) => p.gender === "Men").length ? getNewArrivals().filter((p) => p.gender === "Men") : all.slice(0, 6));
+  wireRailArrows("mn-new-prev", "mn-new-next", "mn-new-track");
+
+  const grid = document.getElementById("men-grid");
+  all.forEach((p, i) => {
+    const card = buildProductCard(p);
+    if (i % 7 === 0) card.classList.add("wide");
+    grid.appendChild(card);
+  });
+
+  buildRail(document.getElementById("mn-essentials-track"), all.filter((p) => p.tags.includes("essentials")));
+
+  window.addEventListener("load", () => { initScrollReveal(); initMagnetic(); });
+})();
+</script>
+</body>
+</html>

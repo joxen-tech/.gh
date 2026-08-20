@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop All — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main>
+  <section id="shop-hero">
+    <div class="wrap">
+      <h1 class="font-archivo" id="shop-title">Shop All</h1>
+      <p id="shop-subtitle">The full catalogue — Men, Women and Kids in one place.</p>
+    </div>
+  </section>
+
+  <section class="page-section" style="padding-top:0;">
+    <div class="wrap">
+      <div class="shop-toolbar">
+        <span class="result-count" id="result-count"></span>
+        <div class="toolbar-actions">
+          <button id="filter-toggle">Filter</button>
+          <select id="sort-select">
+            <option value="featured">Featured</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="newest">Newest</option>
+            <option value="name">Name: A–Z</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="filter-panel">
+        <div class="filter-panel-inner">
+          <div class="filter-group">
+            <h5>Gender</h5>
+            <div class="filter-chip-row" id="f-gender"></div>
+          </div>
+          <div class="filter-group">
+            <h5>Category</h5>
+            <div class="filter-chip-row" id="f-category"></div>
+          </div>
+          <div class="filter-group">
+            <h5>Size</h5>
+            <div class="filter-chip-row" id="f-size"></div>
+          </div>
+          <div class="filter-group">
+            <h5>Color</h5>
+            <div class="filter-chip-row" id="f-color"></div>
+          </div>
+          <div class="filter-group">
+            <h5>Collection</h5>
+            <div class="filter-chip-row" id="f-collection"></div>
+          </div>
+          <div class="filter-group">
+            <h5>Price</h5>
+            <div class="filter-chip-row" id="f-price"></div>
+          </div>
+          <div class="filter-group">
+            <h5>Availability</h5>
+            <div class="filter-chip-row" id="f-availability"></div>
+          </div>
+          <div class="filter-group" style="display:flex;align-items:flex-end;">
+            <button id="filter-clear">Clear All</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="shop-grid" id="shop-grid"></div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  document.getElementById("filter-toggle").innerHTML = ICON.filter + " Filter";
+
+  const state = { gender: null, category: null, size: null, color: null, collection: null, price: null, availability: null, sort: "featured" };
+
+  function paramsToState() {
+    const p = new URLSearchParams(location.search);
+    if (p.get("gender")) state.gender = p.get("gender");
+    if (p.get("category")) state.category = p.get("category");
+    if (p.get("collection")) state.collection = p.get("collection");
+  }
+  paramsToState();
+
+  const ALL_CATEGORIES = [...new Set(PRODUCTS.map((p) => p.category))].sort();
+  const ALL_SIZES = [...new Set(PRODUCTS.flatMap((p) => p.sizes))];
+  const ALL_COLORS = [...new Map(PRODUCTS.flatMap((p) => p.colors).map((c) => [c.name, c])).values()];
+  const PRICE_BUCKETS = [
+    { label: "Under GHS 150", test: (p) => p.price < 150 },
+    { label: "GHS 150 – 300", test: (p) => p.price >= 150 && p.price <= 300 },
+    { label: "GHS 300 – 500", test: (p) => p.price > 300 && p.price <= 500 },
+    { label: "Over GHS 500", test: (p) => p.price > 500 }
+  ];
+
+  function buildChipRow(containerId, options, key, getLabel, getValue) {
+    const wrap = document.getElementById(containerId);
+    wrap.innerHTML = "";
+    options.forEach((opt) => {
+      const val = getValue(opt);
+      const chip = document.createElement("button");
+      chip.className = "filter-chip" + (state[key] === val ? " active" : "");
+      chip.textContent = getLabel(opt);
+      chip.addEventListener("click", () => {
+        state[key] = state[key] === val ? null : val;
+        renderFilters(); renderGrid();
+      });
+      wrap.appendChild(chip);
+    });
+  }
+
+  function renderFilters() {
+    buildChipRow("f-gender", ["Men", "Women", "Boys", "Girls", "Unisex"], "gender", (g) => g, (g) => g);
+    buildChipRow("f-category", ALL_CATEGORIES, "category", (c) => c, (c) => c);
+    buildChipRow("f-size", ALL_SIZES, "size", (s) => s, (s) => s);
+    buildChipRow("f-collection", COLLECTIONS_META, "collection", (c) => c.name, (c) => c.slug);
+    buildChipRow("f-price", PRICE_BUCKETS, "price", (b) => b.label, (b) => b.label);
+    buildChipRow("f-availability", ["In Stock", "Sold Out"], "availability", (a) => a, (a) => a);
+    // color swatches are special-cased (dots not text chips)
+    const colorWrap = document.getElementById("f-color");
+    colorWrap.innerHTML = "";
+    ALL_COLORS.forEach((c) => {
+      const dot = document.createElement("button");
+      dot.className = "filter-color-dot" + (state.color === c.name ? " active" : "");
+      dot.style.background = c.hex;
+      dot.title = c.name;
+      dot.addEventListener("click", () => { state.color = state.color === c.name ? null : c.name; renderFilters(); renderGrid(); });
+      colorWrap.appendChild(dot);
+    });
+  }
+
+  function matchesFilters(p) {
+    if (state.gender && p.gender !== state.gender) return false;
+    if (state.category && p.category !== state.category) return false;
+    if (state.size && !p.sizes.includes(state.size)) return false;
+    if (state.color && !p.colors.some((c) => c.name === state.color)) return false;
+    if (state.collection && p.collection !== state.collection) return false;
+    if (state.price) { const bucket = PRICE_BUCKETS.find((b) => b.label === state.price); if (bucket && !bucket.test(p)) return false; }
+    if (state.availability === "In Stock" && p.stock === 0) return false;
+    if (state.availability === "Sold Out" && p.stock !== 0) return false;
+    return true;
+  }
+
+  function sortProducts(list) {
+    const arr = list.slice();
+    if (state.sort === "price-asc") arr.sort((a, b) => a.price - b.price);
+    else if (state.sort === "price-desc") arr.sort((a, b) => b.price - a.price);
+    else if (state.sort === "newest") arr.sort((a, b) => (b.newArrival === a.newArrival) ? 0 : b.newArrival ? 1 : -1);
+    else if (state.sort === "name") arr.sort((a, b) => a.name.localeCompare(b.name));
+    else arr.sort((a, b) => (b.featured === a.featured) ? 0 : b.featured ? 1 : -1);
+    return arr;
+  }
+
+  function renderGrid() {
+    const filtered = sortProducts(PRODUCTS.filter(matchesFilters));
+    document.getElementById("result-count").textContent = filtered.length + (filtered.length === 1 ? " product" : " products");
+    const grid = document.getElementById("shop-grid");
+    grid.innerHTML = "";
+    if (filtered.length === 0) {
+      grid.innerHTML = '<div class="shop-empty">No products match those filters.<br><button id="empty-clear" class="btn btn-outline" style="margin-top:1rem;">Clear filters</button></div>';
+      document.getElementById("empty-clear").addEventListener("click", clearAll);
+      return;
+    }
+    filtered.forEach((p, i) => {
+      const card = buildProductCard(p);
+      if (i % 7 === 0) card.classList.add("wide");
+      grid.appendChild(card);
+    });
+    // set page heading based on active gender/category filter
+    if (state.gender && !state.category) {
+      document.getElementById("shop-title").textContent = state.gender;
+      document.getElementById("shop-subtitle").textContent = "Shop the full " + state.gender + " edit.";
+    } else if (state.category) {
+      document.getElementById("shop-title").textContent = state.category + (state.gender ? " — " + state.gender : "");
+      document.getElementById("shop-subtitle").textContent = "Filtered to " + state.category + ".";
+    } else if (state.collection) {
+      const meta = getCollectionMeta(state.collection);
+      document.getElementById("shop-title").textContent = meta ? meta.name : "Shop All";
+      document.getElementById("shop-subtitle").textContent = meta ? meta.tagline : "";
+    } else {
+      document.getElementById("shop-title").textContent = "Shop All";
+      document.getElementById("shop-subtitle").textContent = "The full catalogue — Men, Women and Kids in one place.";
+    }
+  }
+
+  function clearAll() {
+    Object.keys(state).forEach((k) => { if (k !== "sort") state[k] = null; });
+    renderFilters(); renderGrid();
+  }
+  document.getElementById("filter-clear").addEventListener("click", clearAll);
+  document.getElementById("filter-toggle").addEventListener("click", () => document.getElementById("filter-panel").classList.toggle("open"));
+  document.getElementById("sort-select").addEventListener("change", (e) => { state.sort = e.target.value; renderGrid(); });
+
+  renderFilters();
+  renderGrid();
+  window.addEventListener("load", () => { initScrollReveal(); initMagnetic(); });
+})();
+</script>
+</body>
+</html>

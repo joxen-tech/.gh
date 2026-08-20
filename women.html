@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Women — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-women">
+<div id="site-header"></div>
+
+<main>
+  <section class="hero-banner">
+    <img src="collection-2.jpg" alt="Women's collection">
+    <div class="hb-content">
+      <h1 class="font-archivo reveal">WOMEN</h1>
+      <p class="reveal">Fluid, tailored, quietly sharp — pieces that move the way you do.</p>
+    </div>
+  </section>
+
+  <section class="page-section" style="padding-top:2rem;">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">The Edit Isn't Linear.</h2><p class="sub">A mixed composition — not everything needs to be the same size.</p></div>
+      </div>
+      <div class="masonry reveal" id="women-masonry"></div>
+    </div>
+  </section>
+
+  <section class="page-section" style="background:#050505;">
+    <div class="wrap">
+      <div class="filter-chip-row reveal" id="women-cat-chips" style="margin-bottom:2.5rem;"></div>
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">New In</h2><p class="sub">Just landed.</p></div>
+        <div class="rail-arrows"><button id="wm-new-prev"></button><button id="wm-new-next"></button></div>
+      </div>
+      <div class="rail-track reveal" id="wm-new-track"></div>
+    </div>
+  </section>
+
+  <section class="page-section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Full Edit</h2><p class="sub" id="women-count"></p></div>
+        <a href="shop.html?gender=Women" class="see-all">Open in Shop →</a>
+      </div>
+      <div class="shop-grid reveal" id="women-grid"></div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  const all = getByGender("Women");
+  document.getElementById("women-count").textContent = all.length + " products";
+
+  const masonrySource = getFeatured().filter((p) => p.gender === "Women").concat(all).slice(0, 6);
+  const spans = [28, 20, 24, 22, 26, 20];
+  const grid1 = document.getElementById("women-masonry");
+  masonrySource.forEach((p, i) => {
+    const el = document.createElement("a");
+    el.href = "product.html?id=" + p.id;
+    el.className = "masonry-item reveal";
+    el.style.setProperty("--span", spans[i % spans.length]);
+    const bg = p.photo ? '<img src="' + p.image + '" alt="' + p.name + '">' : '<div style="position:absolute;inset:0;background:' + placeholderGradient(p) + ';display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);">' + ICON[productGarmentIcon(p)] + '</div>';
+    el.innerHTML = bg + '<div class="m-overlay"><h4 class="font-archivo">' + p.name + '</h4><div class="m-price">GHS ' + p.price + '</div></div>';
+    grid1.appendChild(el);
+  });
+
+  const cats = [...new Set(all.map((p) => p.category))].sort();
+  document.getElementById("women-cat-chips").innerHTML = cats.map((c) => '<a class="filter-chip" href="shop.html?gender=Women&category=' + encodeURIComponent(c) + '">' + c + '</a>').join("");
+
+  const newIn = getNewArrivals().filter((p) => p.gender === "Women");
+  buildRail(document.getElementById("wm-new-track"), newIn.length ? newIn : all.slice(0, 6));
+  wireRailArrows("wm-new-prev", "wm-new-next", "wm-new-track");
+
+  const grid2 = document.getElementById("women-grid");
+  all.forEach((p, i) => {
+    const card = buildProductCard(p);
+    if (i % 7 === 3) card.classList.add("wide");
+    grid2.appendChild(card);
+  });
+
+  window.addEventListener("load", () => { initScrollReveal(); initMagnetic(); });
+})();
+</script>
+</body>
+</html>

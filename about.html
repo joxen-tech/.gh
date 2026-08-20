@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main>
+  <section class="hero-banner">
+    <img src="hero.jpg" alt="dryrobe brand story">
+    <div class="hb-content">
+      <h1 class="font-archivo reveal">OUR STORY</h1>
+      <p class="reveal">Built on the idea that everyday clothing deserves the same care as a runway piece.</p>
+    </div>
+  </section>
+
+  <section class="page-section">
+    <div class="wrap">
+      <div class="prose reveal">
+        <h2 class="font-archivo">Where it started</h2>
+        <p>dryrobe® began as a small print run of graphic hoodies, made for a handful of friends who wanted something heavier, darker and better-constructed than what was on the shelf. What started as a side project became a full catalogue — Men's, Women's and Kids' — built on the same principle: fewer, better pieces, made to be worn for years, not seasons.</p>
+        <h2 class="font-archivo">How we design</h2>
+        <p>Every piece starts with the fabric, not the graphic. We choose weights and blends that hold their shape through repeated wear and washing, then build the silhouette around how the garment is actually going to be used — layered, worn in heat, or lived in on a weekend. The graphics come last, and only when they earn their place.</p>
+        <h2 class="font-archivo">Where we're headed</h2>
+        <p>We're a small, independent operation, which means slower drops and smaller runs — but also means every new collection is something we'd genuinely wear ourselves. Thank you for being part of it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="page-section" style="background:#050505;">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">What We Stand For</h2></div>
+      </div>
+      <div class="values-grid" id="values-grid"></div>
+    </div>
+  </section>
+
+  <section class="page-section">
+    <div class="wrap">
+      <div class="lookbook-grid" id="about-gallery"></div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  const VALUES = [
+    { icon: "garmentKnit", title: "Real Construction", body: "Reinforced seams, considered fabric weights, and cuts tested for how they actually get worn." },
+    { icon: "rotate", title: "Built To Last", body: "We'd rather sell you one hoodie that lasts five years than five that don't survive one." },
+    { icon: "check", title: "Honest Sizing", body: "Every product page lists real measurements — no guessing between a S and a M." }
+  ];
+  const grid = document.getElementById("values-grid");
+  VALUES.forEach((v) => {
+    const el = document.createElement("div");
+    el.className = "value-card reveal";
+    el.innerHTML = ICON[v.icon].replace(/width="\d+" height="\d+"/, 'width="28" height="28"') + '<h3>' + v.title + '</h3><p>' + v.body + '</p>';
+    grid.appendChild(el);
+  });
+
+  const gallery = document.getElementById("about-gallery");
+  ["collection-1.jpg", "collection-2.jpg", "collection-3.jpg"].forEach((img) => {
+    const el = document.createElement("div");
+    el.className = "lookbook-card reveal";
+    el.style.cursor = "default";
+    el.innerHTML = '<img src="' + img + '" alt="dryrobe studio">';
+    gallery.appendChild(el);
+  });
+
+  window.addEventListener("load", () => { initScrollReveal(); initMagnetic(); });
+})();
+</script>
+</body>
+</html>

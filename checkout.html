@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main style="padding:7.5rem 0 5rem;">
+  <div class="wrap" style="max-width:1100px;">
+
+    <div id="checkout-form-view">
+      <h1 class="font-archivo" style="font-size:2rem;color:#fff;margin-bottom:0.5rem;">Checkout</h1>
+      <div class="checkout-steps">
+        <div class="step active"><span class="step-num">1</span> Information</div>
+        <div class="step active"><span class="step-num">2</span> Shipping</div>
+        <div class="step active"><span class="step-num">3</span> Payment</div>
+      </div>
+
+      <div class="disclaimer-box">
+        <span>⚠</span>
+        <span>This is a prototype checkout for demonstration purposes. No payment is actually processed and no order is fulfilled — connect a real payment provider before taking this live.</span>
+      </div>
+
+      <div class="checkout-grid">
+        <div>
+          <form id="checkout-form" novalidate>
+            <div class="checkout-form-section">
+              <h3>Contact Information</h3>
+              <div class="form-field" id="f-email">
+                <label>Email address</label>
+                <input type="email" id="in-email" placeholder="you@example.com">
+                <span class="field-error">Enter a valid email address.</span>
+              </div>
+              <div class="form-field" id="f-phone">
+                <label>Phone number</label>
+                <input type="tel" id="in-phone" placeholder="024 000 0000">
+                <span class="field-error">Enter a valid phone number.</span>
+              </div>
+            </div>
+
+            <div class="checkout-form-section">
+              <h3>Shipping Address</h3>
+              <div class="checkout-form-row two">
+                <div class="form-field" id="f-fname"><label>First name</label><input type="text" id="in-fname"><span class="field-error">Required.</span></div>
+                <div class="form-field" id="f-lname"><label>Last name</label><input type="text" id="in-lname"><span class="field-error">Required.</span></div>
+              </div>
+              <div class="form-field" id="f-address">
+                <label>Street address</label>
+                <input type="text" id="in-address" placeholder="House number, street, area">
+                <span class="field-error">Required.</span>
+              </div>
+              <div class="checkout-form-row two">
+                <div class="form-field" id="f-city"><label>City</label><input type="text" id="in-city" placeholder="Accra"><span class="field-error">Required.</span></div>
+                <div class="form-field" id="f-region"><label>Region</label><input type="text" id="in-region" placeholder="Greater Accra"><span class="field-error">Required.</span></div>
+              </div>
+            </div>
+
+            <div class="checkout-form-section">
+              <h3>Payment Method</h3>
+              <div class="payment-method-list" id="payment-methods"></div>
+            </div>
+
+            <button type="submit" class="pp-add-cart" id="place-order-btn">Place Order — <span id="place-order-total"></span></button>
+          </form>
+        </div>
+
+        <div class="cart-page-summary" style="height:fit-content;">
+          <h3 class="font-archivo">Order Summary</h3>
+          <div id="co-items" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
+          <div class="summary-row"><span>Subtotal</span><span id="co-subtotal"></span></div>
+          <div class="summary-row"><span>Shipping</span><span id="co-shipping"></span></div>
+          <div class="summary-row total"><span>Total</span><span id="co-total"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="checkout-confirm-view" style="display:none;">
+      <div class="order-confirm">
+        <div class="oc-icon" id="oc-icon"></div>
+        <h2 class="font-archivo">Order Placed (Demo)</h2>
+        <p>This is a prototype confirmation — no real order was submitted or charged. In production, a confirmation email would follow.</p>
+        <div class="order-num" id="oc-order-num"></div>
+        <a href="index.html" class="btn btn-light" style="margin-top:2rem;">Back to Home</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  if (Cart.items.length === 0) { location.href = "cart.html"; return; }
+
+  const PAYMENT_METHODS = ["Mobile Money", "Debit / Credit Card", "Cash on Delivery"];
+  const pmWrap = document.getElementById("payment-methods");
+  let selectedPM = PAYMENT_METHODS[0];
+  function renderPM() {
+    pmWrap.innerHTML = PAYMENT_METHODS.map((m, i) =>
+      '<label class="payment-method' + (selectedPM === m ? " active" : "") + '"><input type="radio" name="pm" ' + (selectedPM === m ? "checked" : "") + ' data-pm="' + m + '"><span class="pm-name">' + m + '</span></label>'
+    ).join("");
+    pmWrap.querySelectorAll("[data-pm]").forEach((r) => r.addEventListener("change", () => { selectedPM = r.getAttribute("data-pm"); renderPM(); }));
+  }
+  renderPM();
+
+  function renderSummary() {
+    document.getElementById("co-items").innerHTML = Cart.items.map((it) => {
+      const p = getProduct(it.id);
+      if (!p) return "";
+      const thumb = p.photo ? '<img src="' + p.image + '" alt="" style="width:100%;height:100%;object-fit:cover;">' : ICON[productGarmentIcon(p)];
+      return '<div style="display:flex;gap:0.75rem;align-items:center;"><div class="ctl-thumb" style="width:3rem;height:3rem;">' + thumb + '</div><div style="flex:1;min-width:0;"><div class="ci-name" style="font-size:12px;">' + p.name + '</div><div class="ci-meta">Qty ' + it.qty + ' · ' + it.size + '</div></div><div class="ci-price" style="font-size:12px;">GHS ' + (p.price * it.qty) + '</div></div>';
+    }).join("");
+    document.getElementById("co-subtotal").textContent = "GHS " + Cart.subtotal();
+    const ship = Cart.shipping();
+    document.getElementById("co-shipping").textContent = ship === 0 ? "Free" : "GHS " + ship;
+    document.getElementById("co-total").textContent = "GHS " + Cart.total();
+    document.getElementById("place-order-total").textContent = "GHS " + Cart.total();
+  }
+  renderSummary();
+
+  const FIELDS = [
+    { id: "email", test: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    { id: "phone", test: (v) => v.replace(/\D/g, "").length >= 9 },
+    { id: "fname", test: (v) => v.trim().length > 0 },
+    { id: "lname", test: (v) => v.trim().length > 0 },
+    { id: "address", test: (v) => v.trim().length > 3 },
+    { id: "city", test: (v) => v.trim().length > 0 },
+    { id: "region", test: (v) => v.trim().length > 0 }
+  ];
+
+  document.getElementById("checkout-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    let valid = true;
+    FIELDS.forEach((f) => {
+      const input = document.getElementById("in-" + f.id);
+      const field = document.getElementById("f-" + f.id);
+      const ok = f.test(input.value);
+      field.classList.toggle("error", !ok);
+      if (!ok) valid = false;
+    });
+    if (!valid) {
+      document.querySelector(".form-field.error").scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    const orderNum = "DR" + Math.floor(100000 + Math.random() * 899999);
+    document.getElementById("oc-icon").innerHTML = ICON.check;
+    document.getElementById("oc-order-num").textContent = "Order #" + orderNum;
+    document.getElementById("checkout-form-view").style.display = "none";
+    document.getElementById("checkout-confirm-view").style.display = "block";
+    Cart.clear();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+})();
+</script>
+</body>
+</html>

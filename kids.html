@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kids — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-kids">
+<div id="site-header"></div>
+
+<main>
+  <section class="hero-banner" style="height:40vh;min-height:16rem;">
+    <img src="collection-3.jpg" alt="Kids collection">
+    <div class="hb-content">
+      <h1 class="font-archivo reveal">KIDS</h1>
+      <p class="reveal">Energetic and durable — built for a full day of actual playing.</p>
+    </div>
+  </section>
+
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="kids-ticker"></div>
+  </div>
+
+  <section class="page-section" style="padding-top:2.5rem;">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Boys</h2><p class="sub">Everyday pieces built to keep up.</p></div>
+        <div class="rail-arrows"><button id="boys-prev"></button><button id="boys-next"></button></div>
+      </div>
+      <div class="rail-track reveal" id="boys-track"></div>
+    </div>
+  </section>
+
+  <section class="page-section" style="background:#050505;">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Girls</h2><p class="sub">Playful prints, real durability.</p></div>
+        <div class="rail-arrows"><button id="girls-prev"></button><button id="girls-next"></button></div>
+      </div>
+      <div class="rail-track reveal" id="girls-track"></div>
+    </div>
+  </section>
+
+  <section class="page-section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Full Edit</h2><p class="sub" id="kids-count"></p></div>
+        <a href="shop.html?gender=Boys" class="see-all">Open in Shop →</a>
+      </div>
+      <div class="shop-grid reveal" id="kids-grid"></div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  function fillTicker(id, text, repeats) {
+    const el = document.getElementById(id);
+    let html = "";
+    for (let i = 0; i < repeats; i++) html += "<span>" + text + "</span>";
+    el.innerHTML = html + html;
+  }
+  fillTicker("kids-ticker", "PLAY HARD — WASH REPEAT —", 8);
+
+  const boys = getByGender("Boys");
+  const girls = getByGender("Girls");
+  const all = [...boys, ...girls];
+  document.getElementById("kids-count").textContent = all.length + " products";
+
+  buildRail(document.getElementById("boys-track"), boys);
+  wireRailArrows("boys-prev", "boys-next", "boys-track");
+  buildRail(document.getElementById("girls-track"), girls);
+  wireRailArrows("girls-prev", "girls-next", "girls-track");
+
+  const grid = document.getElementById("kids-grid");
+  all.forEach((p) => grid.appendChild(buildProductCard(p)));
+
+  window.addEventListener("load", () => { initScrollReveal(); initMagnetic(); });
+})();
+</script>
+</body>
+</html>

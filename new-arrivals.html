@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Arrivals — dryrobe®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<main>
+  <section class="drop-hero">
+    <div class="wrap">
+      <span class="eyebrow reveal">The Next Drop</span>
+      <h1 class="font-archivo reveal">THE NEW HAS ARRIVED.</h1>
+      <p class="reveal">The next release lands soon. Here's what's already in — and what's coming next.</p>
+      <div class="countdown-row reveal" id="countdown"></div>
+    </div>
+  </section>
+
+  <div class="ticker-wrap">
+    <div class="ticker-track" id="na-ticker"></div>
+  </div>
+
+  <section class="page-section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Just Landed</h2><p class="sub" id="na-count"></p></div>
+      </div>
+      <div class="shop-grid reveal" id="na-grid"></div>
+    </div>
+  </section>
+
+  <section class="page-section" style="background:#050505;">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div><h2 class="font-archivo">Recently Added</h2><p class="sub">The last few pieces to join the catalogue.</p></div>
+        <div class="rail-arrows"><button id="ra-prev"></button><button id="ra-next"></button></div>
+      </div>
+      <div class="rail-track reveal" id="ra-track"></div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="icons.js"></script>
+<script src="products-data.js"></script>
+<script src="cart.js"></script>
+<script src="layout.js"></script>
+<script>
+(function () {
+  "use strict";
+  function fillTicker(id, text, repeats) {
+    const el = document.getElementById(id);
+    let html = "";
+    for (let i = 0; i < repeats; i++) html += "<span>" + text + "</span>";
+    el.innerHTML = html + html;
+  }
+  fillTicker("na-ticker", "NEW DROP — LIMITED RELEASE —", 6);
+
+  /* countdown to next drop — demo target, 4 days out from page load */
+  const target = new Date(Date.now() + (4 * 24 + 6) * 60 * 60 * 1000);
+  const units = [["days", 24 * 60 * 60 * 1000], ["hrs", 60 * 60 * 1000], ["min", 60 * 1000], ["sec", 1000]];
+  const wrap = document.getElementById("countdown");
+  wrap.innerHTML = units.map((u) => '<div class="countdown-unit"><div class="cu-num" id="cu-' + u[0] + '">00</div><div class="cu-label">' + u[0] + '</div></div>').join("");
+  function tick() {
+    let diff = Math.max(0, target - new Date());
+    units.forEach((u) => {
+      const val = Math.floor(diff / u[1]);
+      diff -= val * u[1];
+      document.getElementById("cu-" + u[0]).textContent = String(val).padStart(2, "0");
+    });
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  const newItems = getNewArrivals();
+  document.getElementById("na-count").textContent = newItems.length + " new pieces";
+  const grid = document.getElementById("na-grid");
+  newItems.forEach((p) => grid.appendChild(buildProductCard(p)));
+
+  const recent = PRODUCTS.slice(-10).reverse();
+  buildRail(document.getElementById("ra-track"), recent);
+  wireRailArrows("ra-prev", "ra-next", "ra-track");
+
+  window.addEventListener("load", () => { initScrollReveal(); initMagnetic(); });
+})();
+</script>
+</body>
+</html>
